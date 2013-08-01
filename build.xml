@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="SeleniumFramework" default="dist" basedir=".">
+
+	<!--配置基本属性-->
+	<property name="code.source.framework.java" value="framework/src/main/java" />
+	<property name="code.source.control-lib.java" value="control-lib/src/main/java" />
+	<property name="code.source.java" description="java源文件路径,当增加模块时,需在此处添加"
+		value="${code.source.framework.java}:${code.source.control-lib.java}" />
+	<property name="build.dir" value="build" />
+	<property name="lib.dir" value="lib" />
+	<property name="framework.resources.dir" value="framework/src/main/resources" />
+	<property name="testng.configs.dir" value="testng-config" />
+	<property name="dist.dir" value="dist" />
+	<property name="version" value="1.0.3" />
+
+	<!--Javac arguments property-->
+	<property name="nowarn" value="on" description="编译时不产生Warning警告信息开关：默认为on" />
+	<property name="debug" value="true" description="编译时打印调试信息：默认为false" />
+	<property name="deprecation" value="off" description="编译时包含被标记为Deprecated内容：默认为off" />
+	<property name="fork" value="true" description="是否使用外部的JDK编译器：默认为true" />
+	<property name="target" value="1.6" description="生成指定版本的.class文件：默认为1.6" />
+	<property name="encoding" value="utf8" description="源文件编码字符集：默认为utf-8" />
+	<property name="memoryMaximumSize" value="300m" description="采用外部JDK编译时，Java VM允许使用的最大内存：默认为300M" />
+
+	<path id="compile.classpath" description="Classpath for SeleniumFramework compile">
+		<fileset dir="${lib.dir}" includes="**/*.jar" />
+	</path>
+
+	<path id="code.source.java.path" description="Source file path for Javadoc">
+		<fileset dir="${code.source.framework.java}" includes="**/*.java" />
+		<fileset dir="${code.source.control-lib.java}" includes="**/*.java" />
+	</path>
+
+	<!--任务初始化-->
+	<target name="init">
+		<tstamp />
+		<delete dir="${build.dir}" />
+		<delete dir="${dist.dir}" />
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${dist.dir}" />
+	</target>
+
+	<!--配置编译任务-->
+	<target name="compile" depends="init">
+		<javac destdir="${build.dir}" debug="${debug}" deprecation="${deprecation}" nowarn="${nowarn}" encoding="${encoding}" fork="${fork}" memoryMaximumSize="${memoryMaximumSize}" target="${target}">
+			<src path="${code.source.java}" />
+			<classpath refid="compile.classpath" />
+		</javac>
+	</target>
+
+	<!--配置打包任务-->
+	<target name="dist-framework" depends="compile">
+		<jar jarfile="${dist.dir}/seleniumframework-${version}.jar">
+			<fileset dir="${build.dir}" />
+			<fileset dir="${code.source.framework.java}"/>
+			<fileset dir="${code.source.control-lib.java}"/>
+		</jar>
+	</target>
+	<target name="dist-resources">
+		<tar destfile="${dist.dir}/resources-${version}.tar" basedir="${framework.resources.dir}" />
+	</target>
+	<target name="dist-libs">
+		<tar destfile="${dist.dir}/lib-${version}.tar" basedir="${lib.dir}" />
+	</target>
+	<target name="dist-testng-configs">
+		<tar destfile="${dist.dir}/testng-config-${version}.tar" basedir="${testng.configs.dir}" />
+	</target>
+	<target name="dist-sourcecode">
+		<tar destfile="${dist.dir}/sourcecode-${version}.tar">
+			<tarfileset dir="${code.source.framework.java}" prefix="${code.source.framework.java}" includes="**/*.java" />
+			<tarfileset dir="${code.source.control-lib.java}" prefix="${code.source.control-lib.java}" includes="**/*.java" />
+		</tar>			
+	</target>
+	<target name="dist-javadoc">
+		<javadoc
+			destdir="${dist.dir}/seleniumframework-javadocs-${version}"
+			author="true"
+			version="true"
+			encoding="UTF-8"
+			windowtitle="SeleniumFramework">
+			<fileset dir="${code.source.framework.java}" includes="**/*.java" />
+			<fileset dir="${code.source.control-lib.java}" includes="**/*.java" />
+		</javadoc>
+	</target>
+	<target name="dist" depends="dist-framework,dist-resources,dist-libs,dist-testng-configs,dist-sourcecode,dist-javadoc">
+
+	</target>
+
+</project>

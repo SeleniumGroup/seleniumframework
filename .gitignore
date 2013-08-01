@@ -1,0 +1,13 @@
+*.iml
+bin
+docs
+testng-config
+changelog.txt
+.idea
+.project
+.settings
+samples
+.*
+
+
+
